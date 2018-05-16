@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>MonkeyMedia API Management</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+</head>
+<body>
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">MNKY</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" id="auths" href="">Auths</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" id="endpoints" href="">Endpoints</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" id="operators" href="">Operators</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" id="vendors" href="">Vendors</a>
+            </li>
+        </ul>
+        <form class="form-inline mr-3" id="environment-form">
+            <select class="form-control" id="environment">
+                <option value="qa" selected>QA</option>
+                <option value="stage">Stage</option>
+                <option value="production" sec:authorize="hasRole('ROLE_ADMIN')">Production</option>
+            </select>
+        </form>
+        <span class="navbar-text mr-3">
+            Hello [[${#httpServletRequest.remoteUser}]]!
+        </span>
+        <form class="form-inline" th:action="@{/logout}" method="post">
+            <button class="btn btn-danger btn-sm my-2 my-sm-0" type="submit">Sign Out</button>
+        </form>
+    </div>
+</nav>
+
+<div id="react"></div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="/built/bundle.js"></script>
+<script>
+    $(document).ready(function(){
+        if (localStorage.selectEnv) {
+            $("select#environment").val(localStorage.selectEnv);
+        }
+        $("select#environment").on("change", function() {
+            const currentEnv = $(this).val();
+            localStorage.setItem('selectEnv', currentEnv);
+            if (window.location.pathname == '/') {
+                window.location = window.location;
+            } else {
+                const pathnameArray = window.location.pathname.split("/");
+                window.location.pathname = currentEnv + "/" + pathnameArray[2];
+            }
+        });
+        $(".nav-link").click(function() {
+            const selectedEnv = $("#environment option:selected").val();
+            $(this).attr("href", "/"+selectedEnv+"/"+$(this).attr("id"));
+        });
+    });
+</script>
+</body>
+</html>
